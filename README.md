@@ -72,32 +72,3 @@ codesc=015748
 ```
 
 A resposta será o arquivo `.xlsx` para download automático.
-
----
-
-## 📁 Estrutura de pastas
-
-```
-/scraper-api
-│-- index.js            # Servidor Express e rotas
-│-- scraper.js          # Lógica do Puppeteer e geração do Excel
-│-- public/
-│   └── index.html      # Interface do usuário (formulário)
-```
-
----
-
-## 📌 Observações
-
-- A tabela de docentes é paginada, e o script clica automaticamente em "Próximo" até o final.
-- O nome do arquivo inclui **data e hora** no formato:
-  ```
-  escola_<codesc>_YYYY-MM-DD_HH-MM.xlsx
-  ```
-- O arquivo é excluído automaticamente após o download ser enviado.
-
----
-
-## 📄 Licença
-
-MIT © [Seu Nome ou Organização]
