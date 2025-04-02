@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scraper de Escola</title>
+  <style>
+    * {
+        box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      max-width: 500px;
+      margin: auto;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      background: #fff;
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5em;
+      font-weight: bold;
+    }
+
+    input {
+      font-size: 1em;
+      padding: 0.6em;
+      width: 100%;
+      margin-bottom: 1em;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      font-size: 1em;
+      padding: 0.7em;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #888;
+      cursor: not-allowed;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 1em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Consulta de Escola</h1>
+  <form id="scrapeForm">
+    <label for="codesc">Código da Escola:</label>
+    <input type="text" id="codesc" name="codesc" required />
+    <button type="submit" id="submitBtn">Baixar Excel</button>
+    <div class="message" id="statusMessage"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('scrapeForm');
+    const button = document.getElementById('submitBtn');
+    const message = document.getElementById('statusMessage');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const codesc = document.getElementById('codesc').value;
+
+      button.disabled = true;
+      message.textContent = '⏳ Processando, por favor aguarde...';
+
+      try {
+        const response = await fetch('/scrape', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ codesc }),
+        });
+
+        if (!response.ok) throw new Error('Erro ao gerar arquivo');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `escola_${codesc}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        message.textContent = '✅ Arquivo gerado com sucesso!';
+      } catch (err) {
+        console.error(err);
+        message.textContent = '❌ Erro ao processar o arquivo.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
