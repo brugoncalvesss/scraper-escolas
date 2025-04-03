@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const archiver = require('archiver');
 const { scrapeEscolaToExcel } = require('./scraper');
+const codesList = require('./codesList');
 
 const app = express();
 const port = 3000;
@@ -10,7 +11,7 @@ const port = 3000;
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-// Rota individual (já existente)
+// Endpoint individual
 app.post('/scrape', async (req, res) => {
   const codesc = req.body.codesc;
 
@@ -34,10 +35,8 @@ app.post('/scrape', async (req, res) => {
   }
 });
 
-// 🆕 Rota para múltiplos códigos
+// Endpoint em lote
 app.post('/scrape-lote', async (req, res) => {
-  const codesList = require('./codesList');
-
   const tempFiles = [];
 
   try {
@@ -66,7 +65,6 @@ app.post('/scrape-lote', async (req, res) => {
           res.status(500).send('Erro ao enviar arquivo ZIP.');
         }
 
-        // Limpa os arquivos após envio
         fs.unlink(zipPath, () => {});
         tempFiles.forEach(f => fs.unlink(f, () => {}));
       });

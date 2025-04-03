@@ -10,7 +10,12 @@ async function scrapeEscolaToExcel(codesc) {
 
   await page.goto(url, { waitUntil: 'networkidle2' });
 
+  // Captura o nome da escola
+  const nomeEscola = await page.$eval('#nome-escola', el => el.innerText.trim());
+
+  // -------------------
   // Gestores
+  // -------------------
   const gestores = await page.$$eval('#myTable2 tbody tr', rows =>
     rows.map(row => {
       const cols = row.querySelectorAll('td');
@@ -21,37 +26,46 @@ async function scrapeEscolaToExcel(codesc) {
     })
   );
 
-  // Docentes com paginação
+  // -------------------
+  // Docentes (com paginação)
+  // -------------------
   let docentes = [];
+
   while (true) {
     await page.waitForSelector('#myTable tbody tr');
-    const pageData = await page.$$eval('#myTable tbody tr', rows =>
+
+    const pageData = await page.$$eval('#myTable tbody tr', (rows, nomeEscola) =>
       rows.map(row => {
         const cols = row.querySelectorAll('td');
         return {
           Funcao: cols[0]?.innerText.trim(),
           Disciplina: cols[1]?.innerText.trim(),
           Modulo: cols[2]?.innerText.trim(),
-          Nome: cols[3]?.innerText.trim()
+          Nome: cols[3]?.innerText.trim(),
+          NomeEscola: nomeEscola
         };
-      })
+      }), nomeEscola
     );
+
     docentes.push(...pageData);
 
     const nextDisabled = await page.$eval('#myTable_next', el =>
       el.classList.contains('disabled')
     );
+
     if (nextDisabled) break;
 
     await Promise.all([
       page.click('#myTable_next'),
-      new Promise(resolve => setTimeout(resolve, 1000)),
+      new Promise(resolve => setTimeout(resolve, 1000))
     ]);
   }
 
   await browser.close();
 
-  // Criar Excel
+  // -------------------
+  // Geração do Excel
+  // -------------------
   const workbook = new ExcelJS.Workbook();
 
   const sheet1 = workbook.addWorksheet('Gestores');
@@ -67,14 +81,16 @@ async function scrapeEscolaToExcel(codesc) {
     { header: 'Disciplina', key: 'Disciplina', width: 30 },
     { header: 'Módulo', key: 'Modulo', width: 15 },
     { header: 'Nome', key: 'Nome', width: 40 },
+    { header: 'Nome da escola', key: 'NomeEscola', width: 40 },
   ];
   sheet2.addRows(docentes);
 
+  // Nome com timestamp
   const now = new Date();
   const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
   const fileName = `escola_${codesc}_${timestamp}.xlsx`;
   const filePath = path.join(__dirname, fileName);
-  
+
   await workbook.xlsx.writeFile(filePath);
 
   return { filePath, fileName };
