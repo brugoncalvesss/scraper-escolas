@@ -5,7 +5,11 @@ const path = require('path');
 
 async function scrapeEscolaToExcel(codesc) {
   const url = `https://transparencia.educacao.sp.gov.br/Home/DetalhesEscola?codesc=${codesc}`;
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+
   const page = await browser.newPage();
 
   await page.goto(url, { waitUntil: 'networkidle2' });
@@ -95,7 +99,10 @@ async function scrapeEscolaToExcel(codesc) {
 }
 
 async function scrapeLoteParaExcel(ids) {
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const page = await browser.newPage();
 
   let allGestores = [];
