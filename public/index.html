@@ -60,6 +60,9 @@
       .bg-blue {
         background-color: #0061fe;
       }
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -68,7 +71,7 @@
       <label for="codesc">Código da Escola:</label>
       <input type="text" id="codesc" name="codesc" required />
       <button type="submit" id="submitBtn">Baixar Excel</button>
-      <button type="button" id="loteBtn" class="bg-blue">
+      <button type="button" id="loteBtn" class="bg-blue hidden">
         Baixar Excel em lote
       </button>
       <div class="message" id="statusMessage"></div>
