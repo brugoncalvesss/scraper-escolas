@@ -2,7 +2,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "start": "node index.js"
   },
   "dependencies": {
     "archiver": "^7.0.1",
