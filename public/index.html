@@ -2,94 +2,123 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scraper de Escola</title>
     <style>
       * {
         box-sizing: border-box;
       }
+
       body {
-        font-family: Arial, sans-serif;
-        padding: 2em;
-        max-width: 500px;
-        margin: auto;
-        background-color: #f4f4f4;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f7f9fc;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
       }
+
+      .container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        margin: 1rem;
+      }
+
       h1 {
         text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
         color: #333;
       }
-      form {
-        background: #fff;
-        padding: 2em;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
+
       label {
-        display: block;
-        margin-bottom: 0.5em;
         font-weight: bold;
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #444;
       }
+
       input {
-        font-size: 1em;
-        padding: 0.6em;
         width: 100%;
-        margin-bottom: 1em;
-        border-radius: 5px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
         border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
       }
+
       button {
-        font-size: 1em;
-        padding: 0.7em;
         width: 100%;
-        margin-top: 0.5em;
+        padding: 0.9rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
         background-color: #4caf50;
         color: white;
-        border: none;
-        border-radius: 5px;
         cursor: pointer;
+        margin-top: 0.5rem;
+        transition: background-color 0.3s ease;
       }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
       button:disabled {
-        background-color: #888;
+        background-color: #999;
         cursor: not-allowed;
       }
+
       .message {
         text-align: center;
-        margin-top: 1em;
+        margin-top: 1rem;
         font-weight: bold;
+        color: #444;
       }
-      .bg-blue {
-        background-color: #0061fe;
-      }
-      .hidden {
-        display: none;
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 1.5rem;
+        }
+
+        h1 {
+          font-size: 1.3rem;
+        }
+
+        input,
+        button {
+          font-size: 1rem;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Consulta de Escola</h1>
-    <form id="scrapeForm">
-      <label for="codesc">Código da Escola:</label>
-      <input type="text" id="codesc" name="codesc" required />
-      <button type="submit" id="submitBtn">Baixar Excel</button>
-      <button type="button" id="loteBtn" class="bg-blue hidden">
-        Baixar Excel em lote
-      </button>
-      <div class="message" id="statusMessage"></div>
-    </form>
+    <div class="container">
+      <h1>Consulta de Escola</h1>
+      <form id="scrapeForm">
+        <label for="codesc">Código da Escola:</label>
+        <input type="text" id="codesc" name="codesc" required />
+        <button type="submit" id="submitBtn">Baixar Excel</button>
+        <div class="message" id="statusMessage"></div>
+      </form>
+    </div>
 
     <script>
       const form = document.getElementById('scrapeForm');
       const button = document.getElementById('submitBtn');
-      const loteBtn = document.getElementById('loteBtn');
       const message = document.getElementById('statusMessage');
 
-      // Requisição individual
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
         const codesc = document.getElementById('codesc').value;
 
         button.disabled = true;
-        loteBtn.disabled = true;
         message.textContent = '⏳ Processando, por favor aguarde...';
 
         try {
@@ -113,40 +142,9 @@
           message.textContent = '✅ Arquivo da escola gerado com sucesso!';
         } catch (err) {
           console.error(err);
-          message.textContent = '❌ Erro ao processar o arquivo individual.';
+          message.textContent = '❌ Erro ao processar o arquivo.';
         } finally {
           button.disabled = false;
-          loteBtn.disabled = false;
-        }
-      });
-
-      // Requisição em lote
-      loteBtn.addEventListener('click', async function () {
-        button.disabled = true;
-        loteBtn.disabled = true;
-        message.textContent = '⏳ Gerando arquivo Excel com várias escolas...';
-
-        try {
-          const response = await fetch('/scrape-lote', { method: 'POST' });
-
-          if (!response.ok) throw new Error('Erro no download em lote');
-
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `escolas_lote.xlsx`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-
-          message.textContent = '✅ Arquivo em lote gerado com sucesso!';
-        } catch (err) {
-          console.error(err);
-          message.textContent = '❌ Erro ao processar o lote.';
-        } finally {
-          button.disabled = false;
-          loteBtn.disabled = false;
         }
       });
     </script>
