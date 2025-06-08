@@ -31,10 +31,10 @@ async function scrapeEscolaToExcel(codesc) {
   let docentes = [];
 
   while (true) {
-    await page.waitForSelector('#myTable tbody tr');
+    await page.waitForSelector('.info-docentes #myTable tbody tr');
 
     const pageData = await page.$$eval(
-      '#myTable tbody tr',
+      '.info-docentes #myTable tbody tr',
       (rows, nomeEscola) =>
         rows.map((row) => {
           const cols = row.querySelectorAll('td');
@@ -140,10 +140,10 @@ async function scrapeLoteParaExcel(ids) {
 
     let docentes = [];
     while (true) {
-      await page.waitForSelector('#myTable tbody tr');
+      await page.waitForSelector('.info-docentes #myTable tbody tr');
 
       const pageData = await page.$$eval(
-        '#myTable tbody tr',
+        '.info-docentes #myTable tbody tr',
         (rows, nomeEscola) =>
           rows.map((row) => {
             const cols = row.querySelectorAll('td');
